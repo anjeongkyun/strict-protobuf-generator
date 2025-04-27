@@ -1,0 +1,43 @@
+# Gradle
+.gradle/
+build/
+
+# IDEA (IntelliJ 설정 파일들)
+.idea/
+*.iml
+
+# Java/Kotlin compile output
+out/
+
+# OS-specific
+.DS_Store
+
+# Logs
+*.log
+
+# Generated files
+generated/
+
+# Protocol Buffer outputs (optional)
+*.pb.go
+*.pb.cc
+*.pb.h
+*.pb.java
+*.pb.dart
+*.pb.rb
+
+# Wrapper files (keep gradlew scripts, ignore caches)
+!gradlew
+!gradlew.bat
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+
+# VS Code settings (if any)
+.vscode/
+
+# Temporary files
+tmp/
+*.tmp
+
+# Test results
+test-results/
