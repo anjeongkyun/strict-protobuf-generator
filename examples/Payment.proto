@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package io.github.protogenerator.example;
+
+option java_multiple_files = true;
+option java_package = "io.github.protogenerator.example";
+
+message Payment {
+  string id = 1;
+  Amount amount = 2;
+  PaymentType type = 3;
+  PaymentStatus status = 4;
+  string paidDateTime = 5;
+  optional string pendingDateTime = 6;
+}
+
+message Amount {
+  int64 value = 1;
+  string currency = 2;
+}
+
+enum PaymentType {
+  PAYMENT_TYPE_UNSPECIFIED = 0;
+  CARD = 1;
+  CASH = 2;
+}
+
+enum PaymentStatus {
+  PAYMENT_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  PAID = 2;
+  FAILED = 3;
+}
