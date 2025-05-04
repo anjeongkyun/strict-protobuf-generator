@@ -191,4 +191,55 @@ public class ConstructorHelperGeneratorTest {
             () -> assertTrue(generated.contains(".setField(field)"))
         );
     }
+
+    @Test
+    @DisplayName("sut_skips_setting_non_optional_reference_fields_when_null")
+    void sut_skips_setting_non_optional_reference_fields_when_null() {
+        // Arrange
+        var sut = new ConstructorHelperGenerator();
+        DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
+            .setName("MixedMessage")
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("text")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING)
+                .setNumber(1)
+                .setProto3Optional(true)
+                .build())
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("status")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM)
+                .setTypeName(".io.github.protogenerator.example.Status")
+                .setNumber(2)
+                .setProto3Optional(true)
+                .build())
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("amount")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE)
+                .setTypeName(".io.github.protogenerator.example.Amount")
+                .setNumber(3)
+                .setProto3Optional(true)
+                .build())
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("count")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32)
+                .setNumber(4)
+                .build())
+            .build();
+
+        // Act
+        String generated = sut.generateConstructorHelper(
+            "io.github.protogenerator.example",
+            "MixedMessage",
+            message
+        );
+
+        // Assert
+        assertAll(
+            () -> assertTrue(generated.contains("if (text != null)")),
+            () -> assertTrue(generated.contains("if (status != null)")),
+            () -> assertTrue(generated.contains("if (amount != null)")),
+            () -> assertTrue(generated.contains("builder.setCount(count)")),
+            () -> assertFalse(generated.contains("builder.setText(text);") && !generated.contains("if"))
+        );
+    }
 }

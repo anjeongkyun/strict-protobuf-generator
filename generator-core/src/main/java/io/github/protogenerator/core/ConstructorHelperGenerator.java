@@ -14,6 +14,7 @@ public class ConstructorHelperGenerator {
 
         builder.append(packageDecl);
         builder.append(generateImports(descriptorProto, protoPackage));
+
         builder.append("public final class ")
             .append(originalClassName)
             .append("Constructor {\n\n")
@@ -40,7 +41,8 @@ public class ConstructorHelperGenerator {
         for (DescriptorProtos.FieldDescriptorProto field : descriptorProto.getFieldList()) {
             String fieldName = field.getName();
             String setter = "set" + StringUtil.capitalize(fieldName);
-            if (field.hasProto3Optional()) {
+            boolean isNullable = JavaTypeMapper.isNullable(field);
+            if (isNullable) {
                 builder.append("        if (")
                     .append(fieldName)
                     .append(" != null) {\n")
