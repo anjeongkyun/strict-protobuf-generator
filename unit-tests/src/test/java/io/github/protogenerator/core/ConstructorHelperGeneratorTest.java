@@ -9,10 +9,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ConstructorHelperGeneratorTest {
-
     @Test
-    @DisplayName("returns valid constructor helper code for typical message")
-    void sut_returns_valid_constructor_helper_code() {
+    @DisplayName("sut_returns_valid_constructor_helper_code_for_typical_message")
+    void sut_returns_valid_constructor_helper_code_for_typical_message() {
         // Arrange
         var sut = new ConstructorHelperGenerator();
         DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
@@ -46,7 +45,95 @@ public class ConstructorHelperGeneratorTest {
     }
 
     @Test
-    @DisplayName("returns empty constructor when message has no fields")
+    @DisplayName("sut_returns_constructor_with_nullable_optional_fields")
+    void sut_returns_constructor_with_nullable_optional_fields() {
+        // Arrange
+        var sut = new ConstructorHelperGenerator();
+        DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
+            .setName("OptionalMessage")
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("optionalField")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32)
+                .setProto3Optional(true)
+                .setNumber(1)
+                .build())
+            .build();
+
+        // Act
+        String generated = sut.generateConstructorHelper(
+            "io.github.protogenerator.optional",
+            "OptionalMessage",
+            message
+        );
+
+        // Assert
+        assertAll(
+            () -> assertTrue(generated.contains("Integer optionalField")),
+            () -> assertTrue(generated.contains("if (optionalField != null)")),
+            () -> assertTrue(generated.contains(".setOptionalField(optionalField)"))
+        );
+    }
+
+    @Test
+    @DisplayName("sut_returns_constructor_handling_enum_types")
+    void sut_returns_constructor_handling_enum_types() {
+        // Arrange
+        var sut = new ConstructorHelperGenerator();
+        DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
+            .setName("EnumMessage")
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("status")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_ENUM)
+                .setTypeName(".io.github.protogenerator.example.PaymentStatus")
+                .setNumber(1)
+                .build())
+            .build();
+
+        // Act
+        String generated = sut.generateConstructorHelper(
+            "io.github.protogenerator.enums",
+            "EnumMessage",
+            message
+        );
+
+        // Assert
+        assertAll(
+            () -> assertTrue(generated.contains("PaymentStatus status")),
+            () -> assertTrue(generated.contains(".setStatus(status)"))
+        );
+    }
+
+    @Test
+    @DisplayName("sut_returns_constructor_handling_message_types")
+    void sut_returns_constructor_handling_message_types() {
+        // Arrange
+        var sut = new ConstructorHelperGenerator();
+        DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
+            .setName("NestedMessage")
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("amount")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE)
+                .setTypeName(".io.github.protogenerator.example.Amount")
+                .setNumber(1)
+                .build())
+            .build();
+
+        // Act
+        String generated = sut.generateConstructorHelper(
+            "io.github.protogenerator.nested",
+            "NestedMessage",
+            message
+        );
+
+        // Assert
+        assertAll(
+            () -> assertTrue(generated.contains("Amount amount")),
+            () -> assertTrue(generated.contains(".setAmount(amount)"))
+        );
+    }
+
+    @Test
+    @DisplayName("sut_returns_empty_constructor_for_empty_message")
     void sut_returns_empty_constructor_for_empty_message() {
         // Arrange
         var sut = new ConstructorHelperGenerator();
@@ -62,8 +149,10 @@ public class ConstructorHelperGeneratorTest {
         );
 
         // Assert
-        assertTrue(generated.contains("public static EmptyMessage from()"));
-        assertFalse(generated.contains(".set")); // 필드가 없으니까 set 메소드가 없어야 정상
+        assertAll(
+            () -> assertTrue(generated.contains("public static EmptyMessage from()")),
+            () -> assertFalse(generated.contains(".set"))
+        );
     }
 
     @ParameterizedTest(name = "maps proto type {0} to java type {1}")
@@ -75,7 +164,8 @@ public class ConstructorHelperGeneratorTest {
         "TYPE_FLOAT, float",
         "TYPE_DOUBLE, double"
     })
-    void sut_maps_proto_types_to_java_types(String protoTypeName, String expectedJavaType) {
+    @DisplayName("sut_maps_proto_types_to_java_types_correctly")
+    void sut_maps_proto_types_to_java_types_correctly(String protoTypeName, String expectedJavaType) {
         // Arrange
         var sut = new ConstructorHelperGenerator();
         DescriptorProtos.FieldDescriptorProto.Type protoType = DescriptorProtos.FieldDescriptorProto.Type.valueOf(protoTypeName);
@@ -96,7 +186,9 @@ public class ConstructorHelperGeneratorTest {
         );
 
         // Assert
-        assertTrue(generated.contains(expectedJavaType + " field"));
-        assertTrue(generated.contains(".setField(field)"));
+        assertAll(
+            () -> assertTrue(generated.contains(expectedJavaType + " field")),
+            () -> assertTrue(generated.contains(".setField(field)"))
+        );
     }
 }

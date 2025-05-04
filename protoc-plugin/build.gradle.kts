@@ -16,5 +16,5 @@ repositories {
 
 dependencies {
     implementation(project(":generator-core"))
-    implementation("com.google.protobuf:protobuf-java:4.28.2")
+    implementation("com.google.protobuf:protobuf-java:3.25.3")
 }

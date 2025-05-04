@@ -1,6 +1,5 @@
 FROM ubuntu:22.04
 
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     unzip \
@@ -9,20 +8,17 @@ RUN apt-get update && apt-get install -y \
     make \
     && apt-get clean
 
-# Set working directory
 WORKDIR /workspace
 
-# Copy project
 COPY . .
 
-# Make Gradle wrapper executable
 RUN chmod +x ./gradlew
-
-# Build the plugin
 RUN ./gradlew :protoc-plugin:installDist
 
-# Set environment variables
+# ➡플러그인 실행 스크립트 추가
+RUN echo '#!/bin/bash\nexec java -cp "/workspace/protoc-plugin/build/install/protoc-plugin/lib/*" io.github.protogenerator.plugin.StrictProtoGenerator' > /workspace/scripts/protoc-gen-strictproto && \
+    chmod +x /workspace/scripts/protoc-gen-strictproto
+
 ENV PATH="/workspace/protoc-plugin/build/install/protoc-plugin/bin:$PATH"
 
-# Default shell
 CMD ["bash"]

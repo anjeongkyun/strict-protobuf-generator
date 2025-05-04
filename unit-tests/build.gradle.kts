@@ -12,7 +12,7 @@ repositories {
 dependencies {
     testImplementation(project(":generator-core"))
     testImplementation(project(":protoc-plugin"))
-    testImplementation("com.google.protobuf:protobuf-java:4.28.2")
+    testImplementation("com.google.protobuf:protobuf-java:3.25.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")

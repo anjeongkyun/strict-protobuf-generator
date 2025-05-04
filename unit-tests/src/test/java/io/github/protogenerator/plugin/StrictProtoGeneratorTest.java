@@ -98,4 +98,47 @@ public class StrictProtoGeneratorTest {
         PluginProtos.CodeGeneratorResponse.File generatedFile = actual.getFile(0);
         assertTrue(generatedFile.getName().endsWith("OrphanMessageConstructor.java"));
     }
+
+    @Test
+    @DisplayName("returns helper handling optional fields properly")
+    void sut_returns_helper_handling_optional_fields_properly() {
+        // Arrange
+        DescriptorProtos.DescriptorProto message = DescriptorProtos.DescriptorProto.newBuilder()
+            .setName("Payment")
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("id")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING)
+                .setNumber(1)
+                .build())
+            .addField(DescriptorProtos.FieldDescriptorProto.newBuilder()
+                .setName("amount")
+                .setType(DescriptorProtos.FieldDescriptorProto.Type.TYPE_INT32)
+                .setProto3Optional(true) // optional 필드
+                .setNumber(2)
+                .build())
+            .build();
+
+        DescriptorProtos.FileDescriptorProto file = DescriptorProtos.FileDescriptorProto.newBuilder()
+            .setName("payment.proto")
+            .setPackage("io.github.protogenerator.payment")
+            .addMessageType(message)
+            .build();
+
+        PluginProtos.CodeGeneratorRequest request = PluginProtos.CodeGeneratorRequest.newBuilder()
+            .addProtoFile(file)
+            .build();
+
+        // Act
+        PluginProtos.CodeGeneratorResponse actual = StrictProtoGenerator.process(request);
+
+        // Assert
+        assertEquals(1, actual.getFileCount());
+        PluginProtos.CodeGeneratorResponse.File generatedFile = actual.getFile(0);
+        String content = generatedFile.getContent();
+
+        assertTrue(content.contains("public static Payment from(String id, Integer amount)"));
+        assertTrue(content.contains("builder.setId(id);"));
+        assertTrue(content.contains("if (amount != null)"));
+        assertTrue(content.contains("builder.setAmount(amount);"));
+    }
 }

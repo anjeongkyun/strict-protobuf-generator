@@ -17,6 +17,7 @@ public class StrictProtoGenerator {
     public static PluginProtos.CodeGeneratorResponse process(PluginProtos.CodeGeneratorRequest request) {
         ConstructorHelperGenerator generator = new ConstructorHelperGenerator();
         PluginProtos.CodeGeneratorResponse.Builder responseBuilder = PluginProtos.CodeGeneratorResponse.newBuilder();
+        responseBuilder.setSupportedFeatures(PluginProtos.CodeGeneratorResponse.Feature.FEATURE_PROTO3_OPTIONAL_VALUE);
 
         List<DescriptorProtos.FileDescriptorProto> protoFiles = request.getProtoFileList();
         for (DescriptorProtos.FileDescriptorProto file : protoFiles) {

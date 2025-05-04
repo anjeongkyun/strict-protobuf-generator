@@ -1,2 +1,2 @@
 #!/bin/bash
-java -cp "/workspace/protoc-plugin/build/install/protoc-plugin/lib/*" io.github.protogenerator.plugin.StrictProtoGenerator
+exec java -cp "/workspace/protoc-plugin/build/install/protoc-plugin/lib/*" io.github.protogenerator.plugin.StrictProtoGenerator
